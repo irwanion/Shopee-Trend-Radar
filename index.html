@@ -1,1427 +1,332 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopee Affiliate Trend Radar - Tabletop & Home Niche</title>
+  <title>Shopee Affiliate Trend Radar</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Chart.js for data visualization -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-          },
-          colors: {
-            shopee: {
-              orange: '#EE4D2D',
-              deep: '#d03e1f',
-              light: '#ff6433',
-              glow: 'rgba(238, 77, 45, 0.15)'
-            },
-            radar: {
-              dark: '#0B0F19',
-              card: '#111827',
-              border: '#1F2937',
-              accent: '#6366F1'
-            }
-          }
-        }
-      }
-    }
-  </script>
-
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      background-color: #080B11;
-      color: #E5E7EB;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      overflow-x: hidden;
-    }
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0B0F19;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1F2937;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #374151;
-    }
-    .radar-grid {
-      background-size: 40px 40px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    }
-    .glass-panel {
-      background: rgba(17, 24, 39, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .chartjs-tooltip {
-      opacity: 1;
-      position: absolute;
-      background: rgba(15, 23, 42, 0.95);
-      color: white;
-      border-radius: 8px;
-      border: 1px solid #374151;
-      padding: 10px;
-      pointer-events: none;
-      transform: translate(-50%, -100%);
-      transition: all .1s ease;
-      z-index: 50;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(229, 231, 235, 1);
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row antialiased">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-  <!-- SIDEBAR NAVIGATION -->
-  <aside class="w-full md:w-64 bg-gray-950 border-r border-gray-800 flex-shrink-0 flex flex-col justify-between z-20">
-    <div>
-      <!-- Brand Logo Header -->
-      <div class="p-5 flex items-center justify-between border-b border-gray-800/80">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-shopee-orange to-amber-500 flex items-center justify-center text-white shadow-lg shadow-shopee-orange/20">
-            <i data-lucide="radar" class="w-6 h-6 animate-spin-slow"></i>
-          </div>
-          <div>
-            <h1 class="font-bold text-base tracking-tight leading-none text-white">TrendRadar<span class="text-shopee-orange">.ai</span></h1>
-            <span class="text-[10px] text-gray-400 font-medium tracking-wide uppercase">Shopee Affiliate ID</span>
-          </div>
+  <!-- Header / Navigation -->
+  <header class="border-b border-slate-800 bg-slate-950/80 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-orange-500/20">
+          <i class="fa-solid font-bold fa-radar"></i>
         </div>
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          ● ID Live
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Shopee Affiliate Trend Radar</h1>
+          <p class="text-xs text-slate-400">Niche: Kitchen, Decor & Tools (Tabletop Focus)</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <span id="data-status" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> Static Mode
         </span>
-      </div>
-
-      <!-- Navigation Links -->
-      <nav class="p-3 space-y-1">
-        <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-white bg-shopee-orange/10 border border-shopee-orange/30 text-shopee-orange">
-          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-          <span>Dashboard & Radar</span>
-        </a>
-        <a href="#" onclick="switchTab('products')" id="nav-products" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-gray-400 hover:text-white hover:bg-gray-900">
-          <i data-lucide="grid" class="w-4 h-4"></i>
-          <span>Visual Product Catalog</span>
-          <span class="ml-auto bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded-full" id="total-count-badge">8</span>
-        </a>
-        <a href="#" onclick="switchTab('content-ai')" id="nav-content-ai" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-gray-400 hover:text-white hover:bg-gray-900">
-          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
-          <span>AI Short Video Hub</span>
-        </a>
-        <a href="#" onclick="switchTab('automation')" id="nav-automation" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-gray-400 hover:text-white hover:bg-gray-900">
-          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-          <span>Data Pipeline & Sync</span>
-        </a>
-      </nav>
-    </div>
-
-    <!-- Niche Target Badge & Sync Status -->
-    <div class="p-4 border-t border-gray-800/80 bg-gray-900/40">
-      <div class="mb-3 p-3 rounded-lg bg-gray-900 border border-gray-800">
-        <div class="flex items-center gap-2 text-xs font-semibold text-gray-300 mb-1">
-          <i data-lucide="box" class="w-3.5 h-3.5 text-shopee-orange"></i>
-          <span>Target Niche Focus:</span>
-        </div>
-        <p class="text-[11px] text-gray-400">Tabletop Unboxing • Kitchen • Decor • Tools</p>
-      </div>
-
-      <button id="quick-sync-btn" onclick="triggerAutoSync()" class="w-full py-2 px-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs font-medium text-gray-200 flex items-center justify-center gap-2 transition-all border border-gray-700">
-        <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-shopee-orange" id="sync-icon"></i>
-        <span>Sync Trends Now</span>
-      </button>
-      <p class="text-[10px] text-gray-500 text-center mt-2" id="last-sync-time">Last synced: Today, 08:30 WIB</p>
-    </div>
-  </aside>
-
-  <!-- MAIN CONTENT CONTAINER -->
-  <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
-
-    <!-- TOP HEADER / SEARCH BAR -->
-    <header class="h-16 border-b border-gray-800 bg-gray-950/80 backdrop-blur sticky top-0 z-10 px-6 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-4 flex-1 max-w-xl">
-        <div class="relative w-full">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"></i>
-          <input type="text" id="global-search" onkeyup="filterProducts()" placeholder="Search tabletop tools, kitchen gadgets, decor trends..." class="w-full bg-gray-900 border border-gray-800 rounded-xl pl-10 pr-4 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-shopee-orange/50 transition">
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <!-- Tabletop Friendly Constraint Toggle -->
-        <label class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-900 border border-gray-800 text-xs font-medium cursor-pointer hover:border-gray-700 transition">
-          <input type="checkbox" id="tabletop-only-toggle" onchange="applyFilters()" checked class="accent-shopee-orange w-4 h-4 rounded">
-          <span class="text-gray-300">📦 Tabletop Unboxing Only</span>
-        </label>
-
-        <!-- Notification Trigger -->
-        <button onclick="toggleAlertsModal()" class="relative p-2 rounded-xl bg-gray-900 border border-gray-800 text-gray-400 hover:text-white transition">
-          <i data-lucide="bell" class="w-4 h-4"></i>
-          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-shopee-orange"></span>
+        <button onclick="reloadRadarData()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-lg border border-slate-700 transition">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> Sync Data
         </button>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- CONTENT BODY - SWITCHABLE TABS -->
-    <div class="p-6 space-y-6 flex-1">
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-      <!-- TAB 1: DASHBOARD & RADAR MATRIX -->
-      <section id="tab-dashboard" class="tab-content space-y-6">
+    <!-- Top KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Tracked Products</div>
+        <div class="text-2xl font-extrabold text-white mt-1" id="kpi-total">0</div>
+        <div class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-arrow-trend-up"></i> Updated today</div>
+      </div>
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Top Gem Opportunity</div>
+        <div class="text-lg font-bold text-amber-400 truncate mt-1" id="kpi-top-gem">Loading...</div>
+        <div class="text-xs text-slate-400 mt-1">High Demand / Low Competition</div>
+      </div>
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Tabletop Friendly Filter</div>
+        <div class="text-2xl font-extrabold text-orange-400 mt-1" id="kpi-tabletop-count">0</div>
+        <div class="text-xs text-slate-400 mt-1"><40cm Desktop filming ready</div>
+      </div>
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Avg Commission Tier</div>
+        <div class="text-2xl font-extrabold text-white mt-1">8.5%</div>
+        <div class="text-xs text-emerald-400 mt-1">Extra Commission Active</div>
+      </div>
+    </div>
 
-        <!-- STATS KPI BAR -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="glass-panel p-4 rounded-2xl relative overflow-hidden">
-            <div class="flex items-center justify-between text-gray-400 mb-2">
-              <span class="text-xs font-medium">Tabletop Breakout Signals</span>
-              <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
-            </div>
-            <div class="text-2xl font-bold text-white">18 Products</div>
-            <span class="text-xs text-emerald-400 font-medium flex items-center gap-1 mt-1">
-              <i data-lucide="arrow-up-right" class="w-3 h-3"></i> +5 new today
-            </span>
-          </div>
+    <!-- Main Grid: Chart + Details -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <div class="glass-panel p-4 rounded-2xl relative overflow-hidden">
-            <div class="flex items-center justify-between text-gray-400 mb-2">
-              <span class="text-xs font-medium">Avg. Commission Rate</span>
-              <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400"><i data-lucide="percent" class="w-4 h-4"></i></div>
-            </div>
-            <div class="text-2xl font-bold text-white">14.2% <span class="text-xs font-normal text-gray-400">Extra Extra</span></div>
-            <span class="text-xs text-amber-400 font-medium flex items-center gap-1 mt-1">
-              Up to Rp 22.500 / sale
-            </span>
-          </div>
-
-          <div class="glass-panel p-4 rounded-2xl relative overflow-hidden">
-            <div class="flex items-center justify-between text-gray-400 mb-2">
-              <span class="text-xs font-medium">Creator Gap Opportunity</span>
-              <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400"><i data-lucide="sparkles" class="w-4 h-4"></i></div>
-            </div>
-            <div class="text-2xl font-bold text-white">High (72%)</div>
-            <span class="text-xs text-indigo-400 font-medium flex items-center gap-1 mt-1">
-              High search vs low short videos
-            </span>
-          </div>
-
-          <div class="glass-panel p-4 rounded-2xl relative overflow-hidden">
-            <div class="flex items-center justify-between text-gray-400 mb-2">
-              <span class="text-xs font-medium">Est. eRPM (10k views)</span>
-              <div class="p-2 rounded-lg bg-shopee-orange/10 text-shopee-orange"><i data-lucide="coins" class="w-4 h-4"></i></div>
-            </div>
-            <div class="text-2xl font-bold text-white">Rp 350.000+</div>
-            <span class="text-xs text-gray-400 font-medium flex items-center gap-1 mt-1">
-              Impulse Price: Rp 25k - 180k
-            </span>
-          </div>
-        </div>
-
-        <!-- CATEGORY & CONSTRAINT FILTERS BAR -->
-        <div class="glass-panel p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4">
-          <div class="flex flex-wrap items-center gap-2" id="category-pills">
-            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-2">Niche:</span>
-            <button onclick="setCategoryFilter('all')" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-shopee-orange text-white">All Niches</button>
-            <button onclick="setCategoryFilter('Compact Kitchen')" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-800 text-gray-300 hover:bg-gray-700">🍳 Compact Kitchen</button>
-            <button onclick="setCategoryFilter('Home Decor')" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-800 text-gray-300 hover:bg-gray-700">🪴 Mini Decor & Lighting</button>
-            <button onclick="setCategoryFilter('DIY Tools')" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-800 text-gray-300 hover:bg-gray-700">🛠️ Desk & DIY Tools</button>
-          </div>
-
-          <div class="flex items-center gap-3">
-            <select id="sort-select" onchange="applyFilters()" class="bg-gray-900 border border-gray-800 text-xs rounded-lg px-3 py-1.5 text-gray-300 focus:outline-none">
-              <option value="score">Sort by: Affiliate Rank Score</option>
-              <option value="demand">Sort by: Growth Velocity</option>
-              <option value="commission">Sort by: Commission Rate</option>
-              <option value="price">Sort by: Price (Low to High)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- MATRIX & TOP PICKS GRID -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          <!-- 2 COLS: RADAR QUADRANT HEATMAP CHART -->
-          <div class="lg:col-span-2 glass-panel p-5 rounded-2xl flex flex-col justify-between">
-            <div class="flex items-center justify-between mb-4">
-              <div>
-                <h3 class="font-bold text-base text-white flex items-center gap-2">
-                  <i data-lucide="crosshair" class="w-5 h-5 text-shopee-orange"></i>
-                  Trend Opportunity Matrix (Indonesia)
-                </h3>
-                <p class="text-xs text-gray-400">Demand Growth (Google/TikTok ID) vs Competition Density (Shopee Sellers)</p>
-              </div>
-              <div class="flex items-center gap-2 text-[11px]">
-                <span class="flex items-center gap-1 text-emerald-400"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Tabletop Gems</span>
-                <span class="flex items-center gap-1 text-amber-400"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Viral Hits</span>
-              </div>
-            </div>
-
-            <!-- Canvas for Bubble Chart -->
-            <div class="relative w-full h-[360px] bg-gray-950/60 rounded-xl p-2 border border-gray-800/80 radar-grid">
-              <!-- Quadrant Labels Background -->
-              <div class="absolute inset-0 grid grid-cols-2 grid-rows-2 pointer-events-none p-4">
-                <div class="border-r border-b border-gray-800/50 p-2 text-[11px] font-semibold text-emerald-400/50 flex flex-col justify-between">
-                  <span>💎 QUADRANT 1: TABLETOP GEMS</span>
-                  <span class="text-[9px] text-emerald-500/40">HIGH DEMAND • LOW COMPETITION</span>
-                </div>
-                <div class="border-b border-gray-800/50 p-2 text-[11px] font-semibold text-amber-400/50 text-right flex flex-col justify-between">
-                  <span>🔥 QUADRANT 2: VIRAL HITS</span>
-                  <span class="text-[9px] text-amber-500/40">HIGH DEMAND • HIGH COMPETITION</span>
-                </div>
-                <div class="border-r border-gray-800/50 p-2 text-[11px] font-semibold text-gray-500/40 flex flex-col justify-between">
-                  <span>🎯 QUADRANT 3: STABLE NICHES</span>
-                  <span class="text-[9px] text-gray-600">MODERATE DEMAND • LOW COMPETITION</span>
-                </div>
-                <div class="p-2 text-[11px] font-semibold text-rose-500/30 text-right flex flex-col justify-between">
-                  <span>⚠️ QUADRANT 4: SATURATED</span>
-                  <span class="text-[9px] text-rose-500/30">LOW DEMAND • HIGH COMPETITION</span>
-                </div>
-              </div>
-              <canvas id="radarMatrixCanvas"></canvas>
-            </div>
-            <p class="text-[11px] text-gray-500 mt-3 text-center">💡 Click any bubble in Quadrant 1 for immediate AI video generation scripts and exact marketplace search links.</p>
-          </div>
-
-          <!-- 1 COL: TOP BREAKOUT HIGHLIGHTS -->
-          <div class="glass-panel p-5 rounded-2xl flex flex-col">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="font-bold text-base text-white flex items-center gap-2">
-                <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
-                Top "Tabletop Gem" Today
-              </h3>
-              <span class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-md font-semibold">Rank #1</span>
-            </div>
-
-            <div id="top-gem-card" class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 flex-1 flex flex-col justify-between">
-              <!-- Top Gem details populated dynamically -->
-              <div class="animate-pulse text-gray-500 text-sm">Loading top breakout product photo...</div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- PRODUCT RANKING TABLE -->
-        <div class="glass-panel rounded-2xl overflow-hidden">
-          <div class="p-5 border-b border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h3 class="font-bold text-base text-white flex items-center gap-2">
-                <i data-lucide="trophy" class="w-5 h-5 text-shopee-orange"></i>
-                Shopee Affiliate Product Opportunity Index
-              </h3>
-              <p class="text-xs text-gray-400">Includes visual photo preview for accurate marketplace identification</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-gray-400">Showing <strong id="showing-count" class="text-white">0</strong> products</span>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="bg-gray-950/60 text-[11px] text-gray-400 uppercase tracking-wider border-b border-gray-800">
-                  <th class="py-3 px-4">Rank / Product Photo</th>
-                  <th class="py-3 px-4">Niche</th>
-                  <th class="py-3 px-4">Price / Commission</th>
-                  <th class="py-3 px-4">Demand Growth</th>
-                  <th class="py-3 px-4">AI Video Score</th>
-                  <th class="py-3 px-4">Affiliate Score</th>
-                  <th class="py-3 px-4 text-right">Marketplace Link</th>
-                </tr>
-              </thead>
-              <tbody id="product-table-body" class="divide-y divide-gray-800/60 text-sm">
-                <!-- Row items inserted via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- TAB 2: RANKED PRODUCTS DETAILED VISUAL GRID -->
-      <section id="tab-products" class="tab-content hidden space-y-6">
-        <div class="flex items-center justify-between">
+      <!-- Scatter Chart (Demand vs Competition) -->
+      <div class="lg:col-span-2 bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 class="text-xl font-bold text-white">Visual Product Catalog</h2>
-            <p class="text-xs text-gray-400">Product photos and direct search links to pinpoint items on Shopee / TikTok Shop</p>
+            <h2 class="text-lg font-bold text-white">Demand Growth vs. Competition Gap</h2>
+            <p class="text-xs text-slate-400">Aim for products in Quadrant 1 (Top Right: High Growth, Low Competition)</p>
+          </div>
+          <button id="filter-tabletop-btn" onclick="toggleTabletopFilter()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500/30 transition">
+            <i class="fa-solid fa-desktop mr-1"></i> Tabletop Only
+          </button>
+        </div>
+        <div class="relative flex-1 min-h-[340px]">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Quick Action / Selected Item Card -->
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-slate-700/60">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Product Intelligence</h3>
+            <span id="selected-score-badge" class="px-2 py-0.5 rounded text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Score: --</span>
+          </div>
+
+          <div id="product-detail-container" class="mt-4 space-y-4">
+            <div class="flex gap-3">
+              <img id="detail-img" src="https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=200&auto=format&fit=crop&q=60" class="w-20 h-20 rounded-lg object-cover bg-slate-900 border border-slate-700">
+              <div class="flex-1 min-w-0">
+                <h4 id="detail-title" class="font-bold text-white text-sm line-clamp-2">Select a product from table or chart</h4>
+                <p id="detail-category" class="text-xs text-slate-400 mt-1">Category: --</p>
+                <div class="flex items-center gap-2 mt-2">
+                  <span id="detail-growth" class="text-xs font-bold text-emerald-400">+0% Growth</span>
+                  <span id="detail-tabletop" class="text-xs text-orange-400"><i class="fa-solid fa-box"></i> Tabletop</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Script Box -->
+            <div class="bg-slate-950/60 rounded-lg p-3 border border-slate-800 space-y-2">
+              <div class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                <span><i class="fa-solid fa-wand-magic-sparkles text-amber-400 mr-1"></i> 15s AI Video Script (ID)</span>
+                <button onclick="copyScript()" class="text-xs text-slate-400 hover:text-white"><i class="fa-regular fa-copy"></i> Copy</button>
+              </div>
+              <p id="detail-script" class="text-xs text-slate-300 italic bg-slate-900/80 p-2 rounded border border-slate-800/80">"Kecil-kecil cabe rawit! Mini vacuum ini bikin meja kerja bersih serpihan makanan cuma 5 detik..."</p>
+            </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="products-grid">
-          <!-- Dynamically filled with product cards containing Unsplash images -->
+        <!-- Marketplace Links -->
+        <div class="mt-4 pt-3 border-t border-slate-700/60">
+          <a id="shopee-search-btn" href="https://shopee.co.id" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20 transition">
+            <i class="fa-solid fa-bag-shopping"></i> Find Exact Product on Shopee
+          </a>
         </div>
-      </section>
-
-
-      <!-- TAB 3: AI SHORT VIDEO HUB -->
-      <section id="tab-content-ai" class="tab-content hidden space-y-6">
-        <div class="glass-panel p-6 rounded-2xl">
-          <div class="flex items-center justify-between mb-6 border-b border-gray-800 pb-4">
-            <div>
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <i data-lucide="sparkles" class="w-6 h-6 text-amber-400"></i>
-                AI Short Video Generator (10–30s Vertical 9:16)
-              </h2>
-              <p class="text-xs text-gray-400">Generates custom hook, script, and visual prompts aligned with the product photo</p>
-            </div>
-            <select id="ai-product-select" onchange="generateAIScriptForSelected()" class="bg-gray-900 border border-gray-700 text-sm text-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:border-shopee-orange">
-              <!-- Filled via JS -->
-            </select>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            <!-- LEFT: SCRIPT & HOOK GENERATOR -->
-            <div class="space-y-4">
-              <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 flex gap-4">
-                <img id="ai-hub-img" src="" alt="Product Photo" class="w-20 h-20 rounded-lg object-cover border border-gray-800 flex-shrink-0">
-                <div class="space-y-1">
-                  <h4 id="ai-hub-title" class="font-bold text-sm text-white">Product Title</h4>
-                  <p id="ai-hub-size" class="text-xs text-gray-400">Size: --</p>
-                  <a id="ai-hub-shopee-link" href="#" target="_blank" class="inline-flex items-center gap-1 text-xs text-shopee-orange hover:underline font-semibold mt-1">
-                    <i data-lucide="external-link" class="w-3 h-3"></i> Find on Shopee
-                  </a>
-                </div>
-              </div>
-
-              <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-semibold text-shopee-orange uppercase tracking-wider">🎯 Hook Strategy (0–3 sec)</span>
-                  <button onclick="copyToClipboard('ai-hook-text')" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
-                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Hook
-                  </button>
-                </div>
-                <div id="ai-hook-text" class="text-sm font-semibold text-white bg-gray-950 p-3 rounded-lg border border-gray-800">
-                  Select a product to generate hook...
-                </div>
-              </div>
-
-              <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">📜 15-30s Voiceover Script (Indonesian)</span>
-                  <button onclick="copyToClipboard('ai-script-text')" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
-                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Script
-                  </button>
-                </div>
-                <div id="ai-script-text" class="text-xs text-gray-300 leading-relaxed bg-gray-950 p-3.5 rounded-lg border border-gray-800 space-y-2 whitespace-pre-line">
-                  Select a product above...
-                </div>
-              </div>
-
-              <!-- CTA Builder -->
-              <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider block mb-2">🛍️ Shopee Video CTA Button Text</span>
-                <div id="ai-cta-text" class="text-xs font-medium text-white bg-gray-950 p-2.5 rounded-lg border border-gray-800">
-                  "Klik keranjang kuning di bawah sebelum kehabisan diskon!"
-                </div>
-              </div>
-            </div>
-
-            <!-- RIGHT: SHOT LIST & AI GENERATION PROMPTS -->
-            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <i data-lucide="clapperboard" class="w-4 h-4 text-shopee-orange"></i>
-                Visual Shot List & Generative Prompts
-              </h3>
-
-              <div class="space-y-3" id="ai-shots-list">
-                <!-- Shot list populated here -->
-              </div>
-
-              <div class="pt-4 border-t border-gray-800">
-                <label class="text-xs font-semibold text-amber-400 uppercase tracking-wider block mb-2">🎨 Master Prompt (Runway Gen-3 / Pika / Sora)</label>
-                <div id="ai-master-prompt" class="text-xs font-mono text-gray-300 bg-gray-950 p-3 rounded-lg border border-gray-800 break-words">
-                  Select product...
-                </div>
-                <button onclick="copyToClipboard('ai-master-prompt')" class="mt-2 text-xs w-full bg-gray-800 hover:bg-gray-700 text-gray-200 py-2 rounded-lg font-medium flex items-center justify-center gap-2 border border-gray-700">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy AI Video Generation Prompt
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-
-      <!-- TAB 4: AUTOMATION PIPELINE & LOGS -->
-      <section id="tab-automation" class="tab-content hidden space-y-6">
-        <div class="glass-panel p-6 rounded-2xl space-y-6">
-          <div class="flex items-center justify-between border-b border-gray-800 pb-4">
-            <div>
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <i data-lucide="database" class="w-6 h-6 text-indigo-400"></i>
-                Automated Data Pipeline Engine
-              </h2>
-              <p class="text-xs text-gray-400">Legal, public data scraping & API polling simulator for Google Trends ID, TikTok Creative Center, & Shopee Feeds</p>
-            </div>
-            <button onclick="triggerAutoSync()" class="px-4 py-2 rounded-xl bg-shopee-orange hover:bg-shopee-deep text-white text-xs font-semibold flex items-center gap-2 transition shadow-lg shadow-shopee-orange/20">
-              <i data-lucide="play" class="w-4 h-4"></i>
-              Run Manual Pipeline Sync
-            </button>
-          </div>
-
-          <!-- Pipeline Architecture Diagram -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-            <div class="p-4 rounded-xl bg-gray-900 border border-gray-800">
-              <div class="w-10 h-10 mx-auto rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mb-2">
-                <i data-lucide="globe" class="w-5 h-5"></i>
-              </div>
-              <h4 class="text-xs font-bold text-white">1. Google Trends ID</h4>
-              <p class="text-[11px] text-gray-500 mt-1">Search volume velocity & breakout triggers</p>
-              <span class="inline-block mt-2 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Active (RSS/Free)</span>
-            </div>
-
-            <div class="p-4 rounded-xl bg-gray-900 border border-gray-800">
-              <div class="w-10 h-10 mx-auto rounded-lg bg-pink-500/10 text-pink-400 flex items-center justify-center mb-2">
-                <i data-lucide="video" class="w-5 h-5"></i>
-              </div>
-              <h4 class="text-xs font-bold text-white">2. TikTok Creative Hub</h4>
-              <p class="text-[11px] text-gray-500 mt-1">Hashtags (#racunshopee) & audio momentum</p>
-              <span class="inline-block mt-2 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Active (Public Web)</span>
-            </div>
-
-            <div class="p-4 rounded-xl bg-gray-900 border border-gray-800">
-              <div class="w-10 h-10 mx-auto rounded-lg bg-shopee-orange/10 text-shopee-orange flex items-center justify-center mb-2">
-                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-              </div>
-              <h4 class="text-xs font-bold text-white">3. Shopee Catalog</h4>
-              <p class="text-[11px] text-gray-500 mt-1">Commission rates & product photo assets</p>
-              <span class="inline-block mt-2 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Active (Affiliate Feed)</span>
-            </div>
-
-            <div class="p-4 rounded-xl bg-gray-900 border border-gray-800">
-              <div class="w-10 h-10 mx-auto rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center mb-2">
-                <i data-lucide="cpu" class="w-5 h-5"></i>
-              </div>
-              <h4 class="text-xs font-bold text-white">4. AI Rank Engine</h4>
-              <p class="text-[11px] text-gray-500 mt-1">Filters tabletop size & script scoring</p>
-              <span class="inline-block mt-2 text-[10px] text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">Ready</span>
-            </div>
-          </div>
-
-          <!-- Live Pipeline Execution Console Log -->
-          <div class="space-y-2">
-            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Live Pipeline Execution Log</h3>
-            <div class="bg-gray-950 font-mono text-xs p-4 rounded-xl border border-gray-800 h-64 overflow-y-auto space-y-1.5" id="pipeline-logs">
-              <div class="text-gray-500">[08:30:01 WIB] Engine initialized. Fetching regional search parameters for geo=ID.</div>
-              <div class="text-emerald-400">[08:30:03 WIB] Google Trends ID RSS loaded: Breakout term detected "Mini Chopper Desk Wireless" (+340%).</div>
-              <div class="text-blue-400">[08:30:05 WIB] TikTok Hashtag Analysis: #racunshopeekitchen reached 4.2M views in 48h.</div>
-              <div class="text-amber-400">[08:30:08 WIB] Shopee Open Catalog matched 8 items with high-res product photos.</div>
-              <div class="text-indigo-400">[08:30:10 WIB] Affiliate rank recalculated. 4 new items flagged as "Quadrant 1 Tabletop Gems".</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
 
     </div>
+
+    <!-- Ranked Product Table -->
+    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5">
+      <h3 class="text-lg font-bold text-white mb-4">Ranked Affiliate Opportunities</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-900/60 text-slate-400 uppercase font-semibold border-b border-slate-700/60">
+            <tr>
+              <th class="p-3">Product</th>
+              <th class="p-3">Category</th>
+              <th class="p-3">Demand Velocity</th>
+              <th class="p-3">Competition Gap</th>
+              <th class="p-3">Affiliate Score</th>
+              <th class="p-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="product-table-body" class="divide-y divide-slate-700/40">
+            <!-- Table rows populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 
-
-  <!-- PRODUCT DETAIL DRAWER MODAL -->
-  <div id="product-drawer" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-end opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="w-full max-w-xl bg-gray-950 border-l border-gray-800 h-full overflow-y-auto p-6 space-y-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300" id="drawer-content">
-      <!-- Loaded dynamically via JS -->
-    </div>
-  </div>
-
-
-  <!-- SIGNAL ALERTS MODAL -->
-  <div id="alerts-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden">
-    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-        <h3 class="font-bold text-white flex items-center gap-2">
-          <i data-lucide="bell" class="w-5 h-5 text-shopee-orange"></i>
-          Real-Time Signal Alerts (ID)
-        </h3>
-        <button onclick="toggleAlertsModal()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-      </div>
-
-      <div class="space-y-3">
-        <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs">
-          <div class="font-bold text-amber-400 flex items-center justify-between mb-1">
-            <span>🔥 High Search Spike</span>
-            <span>12 mins ago</span>
-          </div>
-          <p class="text-gray-300">"Sapu Mini Portable Tabletop" search grew <strong>+340%</strong> on TikTok ID today.</p>
-        </div>
-
-        <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs">
-          <div class="font-bold text-indigo-400 flex items-center justify-between mb-1">
-            <span>⚡ Creator Gap Detected</span>
-            <span>1 hour ago</span>
-          </div>
-          <p class="text-gray-300">"Teko Elektrik Mini Transparan" has high intent searches but only 12 video reviews in Shopee Video.</p>
-        </div>
-
-        <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
-          <div class="font-bold text-emerald-400 flex items-center justify-between mb-1">
-            <span>💰 Extra Commission Bonus</span>
-            <span>3 hours ago</span>
-          </div>
-          <p class="text-gray-300">Store "HomeGadgets.id" boosted commission to <strong>18%</strong> on Mini Vacuum Cleaners.</p>
-        </div>
-      </div>
-
-      <button onclick="toggleAlertsModal()" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-xs text-white rounded-xl font-medium">Close Notifications</button>
-    </div>
-  </div>
-
-
-  <!-- APPLICATION JAVASCRIPT LOGIC -->
   <script>
-    // -------------------------------------------------------------
-    // 1. DATA STORE - INCLUDES HIGH QUALITY PRODUCT PHOTOS (UNSPLASH)
-    // -------------------------------------------------------------
-    const productsData = [
+    // Embedded Default Data (Fallback if data.json is missing)
+    const defaultData = [
       {
-        id: "p1",
-        title: "Mini Chopper Elektrik Wireless 250ml",
-        niche: "Compact Kitchen",
-        price: 45000,
-        commissionRate: 15,
-        extraCommission: true,
-        demandGrowth: 340,
-        competitionScore: 25,
-        aiVideoScore: 96,
-        tabletopSize: "20cm x 10cm",
-        quadrant: 1,
-        shopeeKeyword: "chopper mini elektrik portable 250ml wireless",
-        visualDesc: "Pastel green or white handheld mini food chopper with clear acrylic base and stainless steel blades",
-        image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=600&auto=format&fit=crop&q=80",
-        searchVolume: "84,500/mo",
-        estEarningPer1k: "Rp 420.000",
-        sampleHook: "Jangan beli bumbu jadi sebelum lihat mini chopper ini!",
-        script: "Beli bumbu dapur halusinasi pake ulekan capek banget kan? 😭 Pake mini chopper wireless 45 ribuan ini, tinggal pencet 5 detik langsung halus! Baterai cas USB, ringkas banget di meja dapur. Cek keranjang kuning sekarang!",
-        masterPrompt: "Extreme macro 8k video of a stylish pastel mini electric food chopper on a clean kitchen table chopping garlic and chili in 3 seconds, dynamic camera zoom, ultra-realistic studio lighting, 9:16 vertical.",
-        shotList: [
-          "0-3s: Macro close up of garlic instantly pulverizing",
-          "3-10s: Unboxing unit onto desk with 1 hand",
-          "10-20s: Demonstrating USB charge & quick button press",
-          "20-30s: Result of finely chopped chili + yellow basket click prompt"
-        ]
+        id: 1,
+        name: "Mini Cordless Desk Vacuum Cleaner",
+        category: "Tools & Desk",
+        demandGrowth: 185.4,
+        competitionScore: 88.0,
+        affiliateScore: 92,
+        tabletopFriendly: true,
+        image: "https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=500&auto=format&fit=crop&q=60",
+        shopeeSearch: "Mini+Desk+Vacuum+Cordless",
+        script: "Meja kerja berantakan banyak debu & remahan? Mini vacuum portable ini sedotannya kenceng banget padahal mungil!"
       },
       {
-        id: "p2",
-        title: "Lampu Meja Sunset RGB USB Mini Desk",
-        niche: "Home Decor",
-        price: 32000,
-        commissionRate: 12,
-        extraCommission: true,
-        demandGrowth: 280,
-        competitionScore: 30,
-        aiVideoScore: 92,
-        tabletopSize: "15cm x 8cm",
-        quadrant: 1,
-        shopeeKeyword: "lampu proyektor sunset mini rgb desk studio",
-        visualDesc: "Small black cylindrical LED projector lamp casting circular golden-orange sunset light on wall",
-        image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&auto=format&fit=crop&q=80",
-        searchVolume: "62,100/mo",
-        estEarningPer1k: "Rp 310.000",
-        sampleHook: "Kamar kamu kusam? Ubah vibes dalam 1 detik pake ini!",
-        script: "Cuma 30 ribuan tapi bikin kamar berasa studio aesthetic photoshoot! Lampu sunset mini ini colokan USB, warnanya bisa diganti pake remote. Muat di sudut meja tanpa makankamar. Klik keranjang kuning ya!",
-        masterPrompt: "Cozy aesthetic bedroom desk transformation with glowing warm sunset lamp projection on beige wall, cinematic soft lighting, Satisfying B-roll shot, vertical 9:16 high frame rate.",
-        shotList: [
-          "0-3s: Dark boring room suddenly turns sunset golden red",
-          "3-12s: Hands adjusting mini light on desk beside laptop",
-          "12-25s: Changing colors with mini remote",
-          "25-30s: Final aesthetic vibe shot"
-        ]
+        id: 2,
+        name: "Portable Rechargeable Garlic & Food Chopper 250ml",
+        category: "Kitchen Appliances",
+        demandGrowth: 210.0,
+        competitionScore: 92.5,
+        affiliateScore: 96,
+        tabletopFriendly: true,
+        image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=500&auto=format&fit=crop&q=60",
+        shopeeSearch: "Chopper+Bumbu+Elektrik+Portable",
+        script: "Ngecincang bawang cuma 3 detik tanpa pedih di mata! Mini chopper elektrik ini praktis banget buat dapur minimalist."
       },
       {
-        id: "p3",
-        title: "Sapu Vacuum Mini Portable Meja Desk",
-        niche: "DIY Tools",
-        price: 38000,
-        commissionRate: 18,
-        extraCommission: true,
-        demandGrowth: 210,
-        competitionScore: 18,
-        aiVideoScore: 95,
-        tabletopSize: "10cm x 10cm",
-        quadrant: 1,
-        shopeeKeyword: "mini desk vacuum cleaner portable meja",
-        visualDesc: "Compact palm-sized round battery-powered desk vacuum cleaner in pastel color suctioning dust",
-        image: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=600&auto=format&fit=crop&q=80",
-        searchVolume: "45,000/mo",
-        estEarningPer1k: "Rp 380.000",
-        sampleHook: "Penghapus atau remah biskuit di meja ganggu banget? Tonton ini!",
-        script: "Capek ngusap remah makanan atau remahan penghapus di meja kerja? Penyedot debu mini bentuk lucu ini kenceng banget sedotannya! Pakai baterai, mungil di telapak tangan. Murah cuma 30 ribuan!",
-        masterPrompt: "Satisfying top-down shot of a cute mini mushroom-shaped desk vacuum sucking up eraser shavings and cookie crumbs from a dark wood desk in one smooth pass, 4k 60fps.",
-        shotList: [
-          "0-3s: Messy desk shavings disappearing in 1 stroke",
-          "3-15s: Show top view of desk clean transition",
-          "15-25s: Opening bottom compartment to empty dirt",
-          "25-30s: Storing it neatly next to computer keyboard"
-        ]
-      },
-      {
-        id: "p4",
-        title: "Teko Elektrik Transparan Mini 600ml",
-        niche: "Compact Kitchen",
-        price: 115000,
-        commissionRate: 10,
-        extraCommission: false,
-        demandGrowth: 190,
-        competitionScore: 40,
-        aiVideoScore: 88,
-        tabletopSize: "22cm x 12cm",
-        quadrant: 1,
-        shopeeKeyword: "teko pemanas air mini portable glass kettle 600ml",
-        visualDesc: "Small transparent borosilicate glass electric water kettle with stainless base heating water on desk",
-        image: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f6?w=600&auto=format&fit=crop&q=80",
-        searchVolume: "39,000/mo",
-        estEarningPer1k: "Rp 480.000",
-        sampleHook: "Anak kos & pekerja kantor wajib punya kettle estetik mini ini!",
-        script: "Bikin mie atau kopi di kamar kos tanpa ribet ke dapur! Teko listrik mini kaca transparan ini kapasitas 600ml, mendidih cuma 3 menit! Kaca borosilikat tahan panas, cantik banget dipajang di meja.",
-        masterPrompt: "Close-up of boiling water inside a crystal clear aesthetic mini glass electric kettle on a sleek Scandinavian office desk, steam rising, warm ambient sunlight, 9:16.",
-        shotList: [
-          "0-3s: Water boiling rapidly in clear glass kettle",
-          "3-12s: Pouring hot water into a ceramic coffee mug on table",
-          "12-25s: Showing auto turn-off feature & compact size",
-          "25-30s: Outro with link callout"
-        ]
-      },
-      {
-        id: "p5",
-        title: "Mini Sealer Plastik Kemasan Handheld",
-        niche: "DIY Tools",
-        price: 18000,
-        commissionRate: 14,
-        extraCommission: false,
-        demandGrowth: 310,
-        competitionScore: 65,
-        aiVideoScore: 90,
-        tabletopSize: "8cm x 4cm",
-        quadrant: 2,
-        shopeeKeyword: "mini bag sealer genggam portable pres plastik",
-        visualDesc: "Tiny handheld plastic heat sealer clamp in white/pink sealing snack chip bag",
-        image: "https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=600&auto=format&fit=crop&q=80",
-        searchVolume: "110,000/mo",
-        estEarningPer1k: "Rp 210.000",
-        sampleHook: "Ciki kamu lempem gara-gara gak rapat? Solusi 10 ribuan!",
-        script: "Jangan dibuang Snack yang belum habis! Pakai alat pres plastik saku ini, sekali tekan langsung rapat kayak kemasan baru pabrik lagi. Bikin snack tetep renyah!",
-        masterPrompt: "Macro camera sliding along plastic potato chip bag being perfectly heat-sealed with a mini pastel sealing tool on a tabletop, crisp audio visual focus, 9:16 vertical.",
-        shotList: [
-          "0-3s: Sound of crunchy potato chip bag open vs closed",
-          "3-15s: Pressing mini sealer across bag edge",
-          "15-25s: Turning bag upside down to prove air-tightness",
-          "25-30s: Price drop highlight"
-        ]
-      },
-      {
-        id: "p6",
-        title: "Air Fryer Compact Mini 1.5 Liter Tabletop",
-        niche: "Compact Kitchen",
-        price: 249000,
-        commissionRate: 8,
-        extraCommission: true,
-        demandGrowth: 150,
-        competitionScore: 70,
-        aiVideoScore: 85,
-        tabletopSize: "28cm x 22cm",
-        quadrant: 2,
-        shopeeKeyword: "air fryer mini 1.5L hemat listrik compact",
-        visualDesc: "Sleek retro green or black compact 1.5L air fryer on small studio countertop",
-        image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=600&auto=format&fit=crop&q=80",
-        searchVolume: "95,000/mo",
-        estEarningPer1k: "Rp 650.000",
-        sampleHook: "Airfryer biasa kebesaran di meja dapur? Coba ukuran mini ini!",
-        script: "Dapur sempit tetap bisa masak sehat tanpa minyak! Airfryer mini 1.5L ini muat di sudut meja kecil, watt cuma 500W. Hasil sosis & nugget crispy luar dalam!",
-        masterPrompt: "Golden crispy french fries being pulled out in a compact sleek black mini airfryer basket on a modern small apartment kitchen counter, appetizing slow motion, 9:16.",
-        shotList: [
-          "0-3s: Pulling crispy nuggets basket in slow motion",
-          "3-15s: Show size comparison with a water bottle on table",
-          "15-25s: Knob setting and low watt demo",
-          "25-30s: Taste test bite audio"
-        ]
-      },
-      {
-        id: "p7",
-        title: "Mini Humidifier Diffuser Kayu Aesthetic",
-        niche: "Home Decor",
-        price: 49000,
-        commissionRate: 12,
-        extraCommission: false,
-        demandGrowth: 90,
-        competitionScore: 35,
-        aiVideoScore: 82,
-        tabletopSize: "12cm x 10cm",
-        quadrant: 3,
-        shopeeKeyword: "mini humidifier diffuser wood grain LED aroma",
-        visualDesc: "Wood grain finish spherical essential oil diffuser spewing cool mist with ambient LED ring light",
-        image: "https://images.unsplash.com/photo-1602928321679-560bb453f190?w=600&auto=format&fit=crop&q=80",
-        searchVolume: "28,000/mo",
-        estEarningPer1k: "Rp 240.000",
-        sampleHook: "Ruangan ber-AC bikin kulit kering? Kasih ini di meja kerja!",
-        script: "Ubah meja kerja kamu berasa spa mewah! Humidifier motif kayu ini ngeluarin uap halus + lampu LED warm light. Tetesin essential oil favorit, wangi seharian!",
-        masterPrompt: "Soft mist billowing from a wooden textured round mini humidifier on a wooden desk with Monstera leaf shadow, warm ambient relax atmosphere, 4k vertical.",
-        shotList: [
-          "0-3s: Delicate mist exploding from top aperture",
-          "3-15s: Adding 3 drops of lavender oil into water tank",
-          "15-25s: Turning on LED glowing ring in dark desk setup",
-          "25-30s: Final product purchase banner"
-        ]
-      },
-      {
-        id: "p8",
-        title: "Screwdriver Set Presisi 24-in-1 Magnetik Desk",
-        niche: "DIY Tools",
-        price: 55000,
-        commissionRate: 15,
-        extraCommission: true,
-        demandGrowth: 120,
-        competitionScore: 20,
-        aiVideoScore: 87,
-        tabletopSize: "16cm x 7cm",
-        quadrant: 1,
-        shopeeKeyword: "obeng set presisi 24 in 1 hp laptop kacamata magnetic",
-        visualDesc: "Slim aluminum magnetic case popping open revealing 24 metallic precision screwdriver bits",
-        image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80",
-        searchVolume: "31,000/mo",
-        estEarningPer1k: "Rp 330.000",
-        sampleHook: "Cowok wajib punya alat ini di meja kamar!",
-        script: "Bongkar HP, kacamata, atau mainan kendor gak perlu pusing lagi! Set obeng presisi 24 kepala magnetik ini tersusun rapi di wadah alumunium pop-up. Cuma 50 ribuan!",
-        masterPrompt: "Sleek metallic push-to-open aluminum case popping open revealing 24 magnetic screwdriver bits on a dark workstation tabletop, tech review studio lighting, 9:16.",
-        shotList: [
-          "0-3s: Clicking mechanical pop-up aluminum case open",
-          "3-15s: Testing magnetic screw holding precision bit",
-          "15-25s: Fixing small glasses screw on table",
-          "25-30s: Case slide close satisfying click"
-        ]
+        id: 3,
+        name: "Sunset Red Atmosphere LED Desk Light",
+        category: "Home Decor",
+        demandGrowth: 145.2,
+        competitionScore: 75.0,
+        affiliateScore: 81,
+        tabletopFriendly: true,
+        image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&auto=format&fit=crop&q=60",
+        shopeeSearch: "Lampu+Sunset+LED+Meja",
+        script: "Bikin kamar estetik ala Pinterest cuma modal 30 ribuan! Lampu LED sunset ini estetik parah buat background video."
       }
     ];
 
-    // State Variables
-    let currentCategory = 'all';
-    let currentSearchQuery = '';
-    let selectedProductId = 'p1';
+    let currentProducts = [...defaultData];
     let chartInstance = null;
+    let tabletopFilterActive = false;
 
-    // Helper: Generate Direct Shopee Search URL
-    function getShopeeSearchUrl(keyword) {
-      return `https://shopee.co.id/search?keyword=${encodeURIComponent(keyword)}`;
-    }
-
-    // Helper: Calculate Affiliate Rank Score
-    function calculateAffiliateRankScore(item) {
-      const score = (item.demandGrowth * 0.3) + (item.commissionRate * 2.5) + (item.aiVideoScore * 0.35) - (item.competitionScore * 0.15);
-      return Math.min(Math.max(Math.round(score), 40), 99);
-    }
-
-    function formatRupiah(number) {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
-    }
-
-    // -------------------------------------------------------------
-    // 2. UI TAB SWITCHING LOGIC
-    // -------------------------------------------------------------
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.nav-item').forEach(el => {
-        el.classList.remove('bg-shopee-orange/10', 'border', 'border-shopee-orange/30', 'text-shopee-orange');
-        el.classList.add('text-gray-400');
-      });
-
-      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-      
-      const activeNav = document.getElementById(`nav-${tabName}`);
-      if(activeNav) {
-        activeNav.classList.add('bg-shopee-orange/10', 'border', 'border-shopee-orange/30', 'text-shopee-orange');
-        activeNav.classList.remove('text-gray-400');
+    // Fetch dynamic JSON data or fall back
+    async function reloadRadarData() {
+      try {
+        const res = await fetch('./data.json');
+        if (res.ok) {
+          const liveData = await res.json();
+          currentProducts = liveData;
+          document.getElementById('data-status').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> Live JSON Synced';
+        } else {
+          throw new Error('data.json not found');
+        }
+      } catch (err) {
+        console.log('Using fallback static data');
+        currentProducts = [...defaultData];
       }
-
-      if(tabName === 'dashboard' && chartInstance) {
-        chartInstance.resize();
-      }
+      renderAll();
     }
 
-    // -------------------------------------------------------------
-    // 3. CHART.JS RADAR MATRIX BUBBLE RENDERER
-    // -------------------------------------------------------------
-    function initRadarMatrixChart() {
-      const ctx = document.getElementById('radarMatrixCanvas').getContext('2d');
+    function renderAll() {
+      const filtered = tabletopFilterActive 
+        ? currentProducts.filter(p => p.tabletopFriendly)
+        : currentProducts;
 
-      const datasets = productsData.map(item => {
-        let color = '#3B82F6';
-        if (item.quadrant === 1) color = '#10B981';
-        if (item.quadrant === 2) color = '#F59E0B';
+      renderKPIs(filtered);
+      renderTable(filtered);
+      renderChart(filtered);
+      if (filtered.length > 0) selectProduct(filtered[0]);
+    }
 
-        return {
-          label: item.title,
-          data: [{
-            x: item.demandGrowth,
-            y: 100 - item.competitionScore,
-            r: Math.max(item.commissionRate * 0.9, 6)
-          }],
-          backgroundColor: color + 'BB',
-          borderColor: color,
-          borderWidth: 2,
-          productId: item.id,
-          rawItem: item
-        };
-      });
+    function renderKPIs(items) {
+      document.getElementById('kpi-total').innerText = items.length;
+      document.getElementById('kpi-tabletop-count').innerText = currentProducts.filter(p => p.tabletopFriendly).length;
+      const top = [...items].sort((a,b) => b.affiliateScore - a.affiliateScore)[0];
+      document.getElementById('kpi-top-gem').innerText = top ? top.name : 'N/A';
+    }
 
+    function renderTable(items) {
+      const tbody = document.getElementById('product-table-body');
+      tbody.innerHTML = items.map(p => `
+        <tr class="hover:bg-slate-800/80 cursor-pointer transition" onclick="selectProductById(${p.id})">
+          <td class="p-3 font-semibold text-white flex items-center gap-2">
+            <img src="${p.image}" class="w-8 h-8 rounded object-cover">
+            <span class="truncate max-w-[200px]">${p.name}</span>
+          </td>
+          <td class="p-3 text-slate-400">${p.category}</td>
+          <td class="p-3 text-emerald-400 font-bold">+${p.demandGrowth}%</td>
+          <td class="p-3 text-slate-300">${p.competitionScore}/100</td>
+          <td class="p-3 font-bold text-amber-400">${p.affiliateScore}</td>
+          <td class="p-3 text-right">
+            <a href="https://shopee.co.id/search?keyword=${p.shopeeSearch}" target="_blank" onclick="event.stopPropagation()" class="px-2.5 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded hover:bg-orange-500/30">
+              Shopee <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderChart(items) {
+      const ctx = document.getElementById('radarChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
       chartInstance = new Chart(ctx, {
-        type: 'bubble',
-        data: { datasets },
+        type: 'scatter',
+        data: {
+          datasets: [{
+            label: 'Products',
+            data: items.map(p => ({ x: p.demandGrowth, y: p.competitionScore, product: p })),
+            backgroundColor: items.map(p => p.affiliateScore > 90 ? '#f59e0b' : '#10b981'),
+            pointRadius: 8,
+            pointHoverRadius: 12
+          }]
+        },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
             tooltip: {
-              enabled: false,
-              external: customTooltipHandler
+              callbacks: {
+                label: (ctx) => `${ctx.raw.product.name} (Score: ${ctx.raw.product.affiliateScore})`
+              }
             }
           },
           scales: {
-            x: {
-              title: { display: true, text: 'Search & Demand Growth Velocity (+%)', color: '#9CA3AF', font: { size: 10 } },
-              grid: { color: 'rgba(255,255,255,0.05)' },
-              ticks: { color: '#6B7280', font: { size: 10 } },
-              min: 50,
-              max: 400
-            },
-            y: {
-              title: { display: true, text: 'Low Competition / Gap Score', color: '#9CA3AF', font: { size: 10 } },
-              grid: { color: 'rgba(255,255,255,0.05)' },
-              ticks: { color: '#6B7280', font: { size: 10 } },
-              min: 20,
-              max: 100
-            }
-          },
-          onClick: (e, activeElements) => {
-            if (activeElements.length > 0) {
-              const datasetIndex = activeElements[0].datasetIndex;
-              const product = chartInstance.data.datasets[datasetIndex].rawItem;
-              openProductDrawer(product.id);
-            }
+            x: { title: { display: true, text: 'Demand Growth Velocity (%)', color: '#94a3b8' }, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+            y: { title: { display: true, text: 'Low Competition Gap Score', color: '#94a3b8' }, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
           }
         }
       });
     }
 
-    // Custom Canvas Tooltip
-    function customTooltipHandler(context) {
-      let tooltipEl = document.getElementById('chartjs-tooltip');
+    function selectProductById(id) {
+      const p = currentProducts.find(item => item.id === id);
+      if (p) selectProduct(p);
+    }
 
-      if (!tooltipEl) {
-        tooltipEl = document.createElement('div');
-        tooltipEl.id = 'chartjs-tooltip';
-        tooltipEl.className = 'chartjs-tooltip';
-        document.body.appendChild(tooltipEl);
+    function selectProduct(p) {
+      document.getElementById('detail-title').innerText = p.name;
+      document.getElementById('detail-category').innerText = `Category: ${p.category}`;
+      document.getElementById('detail-growth').innerText = `+${p.demandGrowth}% Growth`;
+      document.getElementById('detail-img').src = p.image;
+      document.getElementById('detail-script').innerText = `"${p.script}"`;
+      document.getElementById('selected-score-badge').innerText = `Score: ${p.affiliateScore}`;
+      document.getElementById('shopee-search-btn').href = `https://shopee.co.id/search?keyword=${p.shopeeSearch}`;
+    }
+
+    function toggleTabletopFilter() {
+      tabletopFilterActive = !tabletopFilterActive;
+      const btn = document.getElementById('filter-tabletop-btn');
+      if (tabletopFilterActive) {
+        btn.classList.replace('bg-orange-500/20', 'bg-orange-500');
+        btn.classList.replace('text-orange-300', 'text-white');
+      } else {
+        btn.classList.replace('bg-orange-500', 'bg-orange-500/20');
+        btn.classList.replace('text-white', 'text-orange-300');
       }
-
-      const tooltipModel = context.tooltip;
-      if (tooltipModel.opacity === 0) {
-        tooltipEl.style.opacity = '0';
-        return;
-      }
-
-      if (tooltipModel.body) {
-        const dataPoint = context.chart.data.datasets[tooltipModel.dataPoints[0].datasetIndex];
-        const item = dataPoint.rawItem;
-
-        tooltipEl.innerHTML = `
-          <div class="flex items-center gap-2 mb-1">
-            <img src="${item.image}" class="w-8 h-8 rounded object-cover border border-gray-700">
-            <div>
-              <div class="font-bold text-xs text-white">${item.title}</div>
-              <div class="text-[10px] text-emerald-400">Growth: +${item.demandGrowth}% | Comm: ${item.commissionRate}%</div>
-            </div>
-          </div>
-          <div class="text-[10px] text-amber-400 mt-1">Click bubble to view photo & links →</div>
-        `;
-      }
-
-      const position = context.chart.canvas.getBoundingClientRect();
-      tooltipEl.style.opacity = '1';
-      tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-      tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY - 10 + 'px';
+      renderAll();
     }
 
-
-    // -------------------------------------------------------------
-    // 4. FILTERING & TABLE RENDER LOGIC
-    // -------------------------------------------------------------
-    function setCategoryFilter(cat) {
-      currentCategory = cat;
-      document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.classList.remove('bg-shopee-orange', 'text-white');
-        btn.classList.add('bg-gray-800', 'text-gray-300');
-      });
-
-      event.target.classList.remove('bg-gray-800', 'text-gray-300');
-      event.target.classList.add('bg-shopee-orange', 'text-white');
-
-      applyFilters();
+    function copyScript() {
+      const scriptText = document.getElementById('detail-script').innerText;
+      navigator.clipboard.writeText(scriptText);
+      alert('Script copied to clipboard!');
     }
 
-    function applyFilters() {
-      const sortBy = document.getElementById('sort-select').value;
-      currentSearchQuery = document.getElementById('global-search').value.toLowerCase();
-
-      let filtered = productsData.filter(item => {
-        const matchesCategory = currentCategory === 'all' || item.niche === currentCategory;
-        const matchesSearch = item.title.toLowerCase().includes(currentSearchQuery) || item.shopeeKeyword.toLowerCase().includes(currentSearchQuery);
-        return matchesCategory && matchesSearch;
-      });
-
-      filtered.sort((a, b) => {
-        if (sortBy === 'score') return calculateAffiliateRankScore(b) - calculateAffiliateRankScore(a);
-        if (sortBy === 'demand') return b.demandGrowth - a.demandGrowth;
-        if (sortBy === 'commission') return b.commissionRate - a.commissionRate;
-        if (sortBy === 'price') return a.price - b.price;
-      });
-
-      renderTable(filtered);
-      renderGridCards(filtered);
-      renderTopGemHighlight(filtered[0] || productsData[0]);
-      
-      document.getElementById('showing-count').innerText = filtered.length;
-      document.getElementById('total-count-badge').innerText = filtered.length;
-    }
-
-    function filterProducts() {
-      applyFilters();
-    }
-
-
-    // Render Ranking Table with Product Image Thumbnails
-    function renderTable(items) {
-      const tbody = document.getElementById('product-table-body');
-      tbody.innerHTML = '';
-
-      if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-500">No products found matching your filter.</td></tr>`;
-        return;
-      }
-
-      items.forEach((item, index) => {
-        const score = calculateAffiliateRankScore(item);
-        const estEarnings = Math.round((item.price * (item.commissionRate / 100)));
-        const shopeeUrl = getShopeeSearchUrl(item.shopeeKeyword);
-
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-900/50 transition cursor-pointer';
-        tr.onclick = () => openProductDrawer(item.id);
-
-        tr.innerHTML = `
-          <td class="py-3.5 px-4">
-            <div class="flex items-center gap-3">
-              <span class="font-bold text-xs w-4 text-gray-500">#${index + 1}</span>
-              <div class="relative w-12 h-12 rounded-lg overflow-hidden border border-gray-800 flex-shrink-0 bg-gray-900">
-                <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
-              </div>
-              <div>
-                <div class="font-semibold text-white hover:text-shopee-orange transition line-clamp-1">${item.title}</div>
-                <span class="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
-                  <i data-lucide="box" class="w-3 h-3 text-shopee-orange"></i> Size: ${item.tabletopSize}
-                </span>
-              </div>
-            </div>
-          </td>
-
-          <td class="py-3.5 px-4">
-            <span class="px-2 py-1 rounded-md text-[11px] font-medium bg-gray-900 border border-gray-800 text-gray-300">
-              ${item.niche}
-            </span>
-          </td>
-
-          <td class="py-3.5 px-4">
-            <div class="font-semibold text-white">${formatRupiah(item.price)}</div>
-            <div class="text-[11px] text-amber-400 font-medium flex items-center gap-1">
-              ${item.commissionRate}% (${formatRupiah(estEarnings)}/sale)
-              ${item.extraCommission ? '<span class="bg-shopee-orange/20 text-shopee-orange text-[9px] px-1 rounded">EXTRA</span>' : ''}
-            </div>
-          </td>
-
-          <td class="py-3.5 px-4">
-            <div class="text-xs font-bold text-emerald-400 flex items-center gap-1">
-              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +${item.demandGrowth}%
-            </div>
-            <div class="text-[10px] text-gray-500">${item.searchVolume}</div>
-          </td>
-
-          <td class="py-3.5 px-4">
-            <div class="flex items-center gap-2">
-              <div class="w-12 bg-gray-800 h-2 rounded-full overflow-hidden">
-                <div class="bg-indigo-500 h-full" style="width: ${item.aiVideoScore}%"></div>
-              </div>
-              <span class="text-xs font-semibold text-indigo-300">${item.aiVideoScore}</span>
-            </div>
-            <span class="text-[9px] text-gray-500">10-30s Suitability</span>
-          </td>
-
-          <td class="py-3.5 px-4">
-            <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${score > 85 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-gray-800 text-gray-300'}">
-              ${score} / 100
-            </span>
-          </td>
-
-          <td class="py-3.5 px-4 text-right">
-            <a href="${shopeeUrl}" target="_blank" onclick="event.stopPropagation()" class="px-3 py-1.5 rounded-lg bg-shopee-orange/10 hover:bg-shopee-orange text-shopee-orange hover:text-white border border-shopee-orange/30 text-xs font-semibold inline-flex items-center gap-1 transition">
-              <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> Shopee <i data-lucide="external-link" class="w-3 h-3"></i>
-            </a>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      lucide.createIcons();
-    }
-
-    // Render Grid Cards for Tab 2
-    function renderGridCards(items) {
-      const container = document.getElementById('products-grid');
-      container.innerHTML = '';
-
-      items.forEach(item => {
-        const score = calculateAffiliateRankScore(item);
-        const shopeeUrl = getShopeeSearchUrl(item.shopeeKeyword);
-
-        const card = document.createElement('div');
-        card.className = 'glass-panel p-4 rounded-2xl space-y-3 hover:border-shopee-orange/40 transition cursor-pointer flex flex-col justify-between';
-        card.onclick = () => openProductDrawer(item.id);
-
-        card.innerHTML = `
-          <div class="space-y-3">
-            <div class="relative w-full h-44 rounded-xl overflow-hidden border border-gray-800 bg-gray-950">
-              <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
-              <span class="absolute top-2 left-2 text-[10px] font-bold uppercase text-white bg-shopee-orange px-2 py-0.5 rounded shadow">
-                ${item.niche}
-              </span>
-              <span class="absolute top-2 right-2 text-xs font-bold text-emerald-400 bg-gray-950/90 backdrop-blur px-2 py-0.5 rounded border border-gray-800">
-                Score: ${score}
-              </span>
-            </div>
-
-            <h3 class="font-bold text-sm text-white hover:text-shopee-orange transition line-clamp-2">${item.title}</h3>
-            
-            <div class="flex items-center justify-between pt-2 border-t border-gray-800/80">
-              <div>
-                <span class="text-[10px] text-gray-400 block">Price</span>
-                <span class="font-bold text-white text-xs">${formatRupiah(item.price)}</span>
-              </div>
-              <div class="text-right">
-                <span class="text-[10px] text-gray-400 block">Commission</span>
-                <span class="font-bold text-amber-400 text-xs">${item.commissionRate}%</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="space-y-2 pt-2">
-            <a href="${shopeeUrl}" target="_blank" onclick="event.stopPropagation()" class="w-full py-2 bg-shopee-orange text-white text-xs font-bold rounded-xl hover:bg-shopee-deep transition flex items-center justify-center gap-1">
-              <i data-lucide="search" class="w-3.5 h-3.5"></i> Find Exact Product on Shopee
-            </a>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-
-      lucide.createIcons();
-    }
-
-    // Render Top Gem Highlight Card with Visual Image
-    function renderTopGemHighlight(item) {
-      const container = document.getElementById('top-gem-card');
-      const shopeeUrl = getShopeeSearchUrl(item.shopeeKeyword);
-
-      container.innerHTML = `
-        <div class="space-y-3">
-          <div class="relative w-full h-48 rounded-xl overflow-hidden border border-gray-800 bg-gray-950">
-            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
-            <span class="absolute top-2 left-2 text-[10px] font-bold text-emerald-400 bg-emerald-950/90 border border-emerald-500/30 px-2 py-0.5 rounded backdrop-blur">
-              💎 Quadrant 1 Tabletop Gem
-            </span>
-          </div>
-
-          <h4 class="font-bold text-base text-white leading-snug">${item.title}</h4>
-
-          <div class="grid grid-cols-2 gap-2 text-xs py-2 bg-gray-950/80 p-3 rounded-xl border border-gray-800">
-            <div>
-              <span class="text-gray-500 block text-[10px]">PRICE</span>
-              <span class="font-bold text-white">${formatRupiah(item.price)}</span>
-            </div>
-            <div>
-              <span class="text-gray-500 block text-[10px]">COMMISSION</span>
-              <span class="font-bold text-amber-400">${item.commissionRate}% Extra</span>
-            </div>
-            <div>
-              <span class="text-gray-500 block text-[10px]">TABLETOP SIZE</span>
-              <span class="font-medium text-gray-300">${item.tabletopSize}</span>
-            </div>
-            <div>
-              <span class="text-gray-500 block text-[10px]">DEMAND SPIKE</span>
-              <span class="font-bold text-emerald-400">+${item.demandGrowth}%</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-4 space-y-2">
-          <a href="${shopeeUrl}" target="_blank" class="w-full py-2.5 bg-shopee-orange text-white font-bold text-xs rounded-xl shadow-lg shadow-shopee-orange/20 hover:bg-shopee-deep transition flex items-center justify-center gap-2">
-            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Search Item on Shopee Marketplace
-          </a>
-          <button onclick="openProductDrawer('${item.id}')" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold rounded-xl transition">
-            View AI Script & Visual Specs
-          </button>
-        </div>
-      `;
-
-      lucide.createIcons();
-    }
-
-
-    // -------------------------------------------------------------
-    // 5. PRODUCT DRAWER WITH VISUAL HELPER & SHOPEE SEARCH
-    // -------------------------------------------------------------
-    function openProductDrawer(productId) {
-      const item = productsData.find(p => p.id === productId);
-      if (!item) return;
-
-      selectedProductId = productId;
-      const score = calculateAffiliateRankScore(item);
-      const shopeeUrl = getShopeeSearchUrl(item.shopeeKeyword);
-
-      const drawer = document.getElementById('product-drawer');
-      const drawerContent = document.getElementById('drawer-content');
-
-      drawerContent.innerHTML = `
-        <div class="space-y-5">
-          <div class="flex items-center justify-between border-b border-gray-800 pb-4">
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-shopee-orange bg-shopee-orange/10 px-2 py-0.5 rounded border border-shopee-orange/20">${item.niche}</span>
-              <h2 class="text-lg font-bold text-white mt-1">${item.title}</h2>
-            </div>
-            <button onclick="closeProductDrawer()" class="text-gray-400 hover:text-white p-2 bg-gray-900 rounded-xl"><i data-lucide="x" class="w-5 h-5"></i></button>
-          </div>
-
-          <!-- LARGE PRODUCT PHOTO PREVIEW -->
-          <div class="relative w-full h-56 rounded-2xl overflow-hidden border border-gray-800 bg-gray-900">
-            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover">
-            <div class="absolute bottom-3 left-3 right-3 bg-gray-950/80 backdrop-blur p-2.5 rounded-xl border border-gray-800 flex items-center justify-between text-xs">
-              <span class="text-gray-300 font-medium">Visual Specs:</span>
-              <span class="text-amber-400 font-semibold">${item.visualDesc}</span>
-            </div>
-          </div>
-
-          <!-- DIRECT SHOPEE SEARCH BUTTON -->
-          <div class="p-4 bg-shopee-orange/10 border border-shopee-orange/30 rounded-xl space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-shopee-orange uppercase tracking-wider">🛒 Marketplace Finder</span>
-              <span class="text-[10px] text-gray-400">Pre-filled Search Query</span>
-            </div>
-            <a href="${shopeeUrl}" target="_blank" class="w-full py-2.5 bg-shopee-orange hover:bg-shopee-deep text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-              <i data-lucide="external-link" class="w-4 h-4"></i>
-              Open Search Results on Shopee.co.id
-            </a>
-          </div>
-
-          <!-- METRICS GRID -->
-          <div class="grid grid-cols-3 gap-3 text-center">
-            <div class="p-3 bg-gray-900 border border-gray-800 rounded-xl">
-              <span class="text-[10px] text-gray-400 block">Affiliate Score</span>
-              <span class="text-lg font-extrabold text-emerald-400">${score}/100</span>
-            </div>
-            <div class="p-3 bg-gray-900 border border-gray-800 rounded-xl">
-              <span class="text-[10px] text-gray-400 block">Commission</span>
-              <span class="text-lg font-extrabold text-amber-400">${item.commissionRate}%</span>
-            </div>
-            <div class="p-3 bg-gray-900 border border-gray-800 rounded-xl">
-              <span class="text-[10px] text-gray-400 block">Search Spike</span>
-              <span class="text-lg font-extrabold text-indigo-400">+${item.demandGrowth}%</span>
-            </div>
-          </div>
-
-          <!-- VISUAL DESCRIPTION COPY HELPER -->
-          <div class="p-4 bg-gray-900 border border-gray-800 rounded-xl space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Exact Visual Keywords (For TikTok/Shopee Search)</span>
-              <button onclick="copyToClipboardText('${item.visualDesc}')" class="text-xs text-shopee-orange hover:underline font-medium">Copy Desc</button>
-            </div>
-            <p class="text-xs text-gray-300 bg-gray-950 p-2.5 rounded-lg border border-gray-800 font-mono">${item.visualDesc}</p>
-          </div>
-
-          <!-- 15-30s SCRIPT GENERATOR SUMMARY -->
-          <div class="p-4 bg-gray-900 border border-gray-800 rounded-xl space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
-                <i data-lucide="sparkles" class="w-4 h-4"></i>
-                15-30s Voiceover Script (Bahasa Indonesia)
-              </span>
-              <button onclick="copyToClipboardText('${item.script}')" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
-                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Script
-              </button>
-            </div>
-            <p class="text-xs text-gray-200 leading-relaxed bg-gray-950 p-3 rounded-lg border border-gray-800/80">${item.script}</p>
-          </div>
-        </div>
-
-        <div class="pt-4 border-t border-gray-800 flex items-center gap-3">
-          <button onclick="switchTab('content-ai'); populateAIHub('${item.id}'); closeProductDrawer();" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
-            <i data-lucide="clapperboard" class="w-4 h-4"></i>
-            Open AI Video Studio
-          </button>
-        </div>
-      `;
-
-      drawer.classList.remove('opacity-0', 'pointer-events-none');
-      document.getElementById('drawer-content').classList.remove('translate-x-full');
-      lucide.createIcons();
-    }
-
-    function closeProductDrawer() {
-      const drawer = document.getElementById('product-drawer');
-      document.getElementById('drawer-content').classList.add('translate-x-full');
-      setTimeout(() => {
-        drawer.classList.add('opacity-0', 'pointer-events-none');
-      }, 300);
-    }
-
-
-    // -------------------------------------------------------------
-    // 6. AI VIDEO HUB GENERATOR LOGIC
-    // -------------------------------------------------------------
-    function populateAISelectDropdown() {
-      const select = document.getElementById('ai-product-select');
-      select.innerHTML = '';
-
-      productsData.forEach(p => {
-        const option = document.createElement('option');
-        option.value = p.id;
-        option.innerText = `${p.title} (${p.niche})`;
-        select.appendChild(option);
-      });
-
-      populateAIHub(selectedProductId);
-    }
-
-    function generateAIScriptForSelected() {
-      const selectedId = document.getElementById('ai-product-select').value;
-      populateAIHub(selectedId);
-    }
-
-    function populateAIHub(productId) {
-      const item = productsData.find(p => p.id === productId);
-      if (!item) return;
-
-      document.getElementById('ai-product-select').value = productId;
-      document.getElementById('ai-hub-img').src = item.image;
-      document.getElementById('ai-hub-title').innerText = item.title;
-      document.getElementById('ai-hub-size').innerText = `Tabletop Size: ${item.tabletopSize}`;
-      
-      const shopeeLink = document.getElementById('ai-hub-shopee-link');
-      shopeeLink.href = getShopeeSearchUrl(item.shopeeKeyword);
-
-      document.getElementById('ai-hook-text').innerText = item.sampleHook;
-      document.getElementById('ai-script-text').innerText = item.script;
-      document.getElementById('ai-master-prompt').innerText = item.masterPrompt;
-
-      const shotsContainer = document.getElementById('ai-shots-list');
-      shotsContainer.innerHTML = '';
-
-      item.shotList.forEach((shot, idx) => {
-        const div = document.createElement('div');
-        div.className = 'p-3 bg-gray-950 rounded-lg border border-gray-800 text-xs flex items-center justify-between';
-        div.innerHTML = `
-          <span class="text-gray-300"><strong class="text-shopee-orange">Shot ${idx + 1}:</strong> ${shot}</span>
-          <span class="text-[10px] text-gray-500 font-mono">9:16 Frame</span>
-        `;
-        shotsContainer.appendChild(div);
-      });
-
-      lucide.createIcons();
-    }
-
-
-    // -------------------------------------------------------------
-    // 7. AUTOMATION SIMULATOR ENGINE
-    // -------------------------------------------------------------
-    function triggerAutoSync() {
-      const syncIcon = document.getElementById('sync-icon');
-      syncIcon.classList.add('animate-spin');
-
-      const logsContainer = document.getElementById('pipeline-logs');
-      const now = new Date().toLocaleTimeString('id-ID');
-
-      const newLog = document.createElement('div');
-      newLog.className = 'text-emerald-400 font-semibold';
-      newLog.innerText = `[${now} WIB] Manual Auto-Sync initiated: Polling Google Trends ID RSS & TikTok Creative Center...`;
-      logsContainer.prepend(newLog);
-
-      setTimeout(() => {
-        const log2 = document.createElement('div');
-        log2.className = 'text-blue-400';
-        log2.innerText = `[${now} WIB] Pulled 8 items with high-resolution Unsplash product assets.`;
-        logsContainer.prepend(log2);
-      }, 1000);
-
-      setTimeout(() => {
-        const log3 = document.createElement('div');
-        log3.className = 'text-amber-400 font-semibold';
-        log3.innerText = `[${now} WIB] Pipeline finished. Affiliate Rank scores & marketplace links updated.`;
-        logsContainer.prepend(log3);
-
-        syncIcon.classList.remove('animate-spin');
-        document.getElementById('last-sync-time').innerText = `Last synced: Today, ${now} WIB`;
-      }, 2000);
-    }
-
-
-    // -------------------------------------------------------------
-    // 8. UTILITIES & MODAL CONTROLS
-    // -------------------------------------------------------------
-    function toggleAlertsModal() {
-      const modal = document.getElementById('alerts-modal');
-      modal.classList.toggle('hidden');
-    }
-
-    function copyToClipboard(elementId) {
-      const text = document.getElementById(elementId).innerText;
-      copyToClipboardText(text);
-    }
-
-    function copyToClipboardText(text) {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-
-      const toast = document.createElement('div');
-      toast.className = 'fixed bottom-5 right-5 z-50 bg-emerald-500 text-white font-bold text-xs px-4 py-3 rounded-xl shadow-2xl transition animate-bounce';
-      toast.innerText = '✓ Copied to clipboard!';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2000);
-    }
-
-
-    // INITIALIZATION ON WINDOW LOAD
-    window.onload = function () {
-      lucide.createIcons();
-      initRadarMatrixChart();
-      applyFilters();
-      populateAISelectDropdown();
-    };
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', reloadRadarData);
   </script>
 </body>
 </html>
